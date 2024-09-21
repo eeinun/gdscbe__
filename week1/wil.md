@@ -39,9 +39,9 @@
 	- URL
 ## 투두메이트 클론코딩 api 명세
 - 회원가입
-	GET /register
+	`GET` /register
 - 로그인
-	GET /login
+	`GET` /login
 - 할일
 	/{user_id}/todo
 	- 할일 조회: `GET` /{user_id}/todo/list
