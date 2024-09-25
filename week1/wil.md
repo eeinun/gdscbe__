@@ -56,3 +56,6 @@
 	- 친구 조회: `GET` /{user_id}/friends/list
 	- 친구 삭제: `DELETE` /{user_id}/friends/{friend_id}
 	- 특정 친구 할일 조회: `GET` /{friend_id}/todo/list
+
+
+![localhost:8080]({451CE21B-C5DF-4ECE-A4C8-A2548BCE4AC9}.png)
