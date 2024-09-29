@@ -70,3 +70,5 @@
         @Autowired
         private MySubBean mySubBean
         ```
+# 과제
+![alt text](image.png)
