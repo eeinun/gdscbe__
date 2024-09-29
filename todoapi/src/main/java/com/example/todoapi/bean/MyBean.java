@@ -1,4 +1,4 @@
-package com.example.todo_api.bean;
+package com.example.todoapi.bean;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;

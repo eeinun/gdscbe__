@@ -1,4 +1,4 @@
-package com.example.todo_api.bean;
+package com.example.todoapi.bean;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
