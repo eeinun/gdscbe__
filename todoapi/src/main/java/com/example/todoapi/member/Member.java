@@ -1,4 +1,4 @@
-package com.example.todoapi.todo;
+package com.example.todoapi.member;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

@@ -1,5 +1,6 @@
 package com.example.todoapi.todo;
 
+import com.example.todoapi.member.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -9,22 +10,22 @@ import lombok.NoArgsConstructor;
 public class Todo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "todo_id")
+    @Column(name = "id", columnDefinition = "BIGINT")
     private Long id;
 
-    @Column(name = "todo_content", columnDefinition = "varchar(200)")
+    @Column(name = "content", columnDefinition = "VARCHAR(2000)")
     private String content;
 
-    @Column(name = "todo_is_checked", columnDefinition = "tinyint(1)")
-    private boolean isChecked;
+    @Column(name = "toggle", columnDefinition = "BOOLEAN")
+    private boolean toggle;
 
-    @JoinColumn(name = "member_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "uid")
     private Member member;
 
-    public Todo(String content, boolean isChecked, Member member) {
+    public Todo(String content, boolean toggle, Member member) {
         this.content = content;
-        this.isChecked = isChecked;
+        this.toggle = toggle;
         this.member = member;
     }
 }

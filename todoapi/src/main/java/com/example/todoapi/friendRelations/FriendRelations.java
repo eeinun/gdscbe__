@@ -1,5 +1,6 @@
-package com.example.todoapi.todo;
+package com.example.todoapi.friendRelations;
 
+import com.example.todoapi.member.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
