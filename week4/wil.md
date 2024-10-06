@@ -72,4 +72,4 @@ public class Todo {
 ```
 
 # TODO ERD
-![alt text]({A024EA51-20E2-4F1F-A4A7-4EE86B734581}.png)
+![alt text](image.png)
