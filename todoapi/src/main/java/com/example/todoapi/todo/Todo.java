@@ -3,9 +3,11 @@ package com.example.todoapi.todo;
 import com.example.todoapi.member.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter(AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Todo {
     @Id
@@ -27,5 +29,9 @@ public class Todo {
         this.content = content;
         this.toggle = toggle;
         this.member = member;
+    }
+
+    public void updateContent(String newContent) {
+        this.content = newContent;
     }
 }
