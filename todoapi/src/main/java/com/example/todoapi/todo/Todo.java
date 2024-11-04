@@ -25,13 +25,17 @@ public class Todo {
     @JoinColumn(name = "uid")
     private Member member;
 
-    public Todo(String content, boolean toggle, Member member) {
+    public Todo(String content, Member member) {
         this.content = content;
-        this.toggle = toggle;
+        this.toggle = false;
         this.member = member;
     }
 
     public void updateContent(String newContent) {
         this.content = newContent;
+    }
+
+    public void toggleTodo() {
+        this.toggle = !this.toggle;
     }
 }

@@ -61,9 +61,9 @@ public class TodoRepositoryTest {
         memberRepository.save(member1);
         memberRepository.save(member2);
 
-        Todo todo1 = new Todo("Todo content1", false, member1);
-        Todo todo2 = new Todo("Todo content2", false, member1);
-        Todo todo3 = new Todo("Todo content3", false, member2);
+        Todo todo1 = new Todo("Todo content1", member1);
+        Todo todo2 = new Todo("Todo content2", member1);
+        Todo todo3 = new Todo("Todo content3", member2);
         todoRepository.save(todo1);
         todoRepository.save(todo2);
         todoRepository.save(todo3);
@@ -91,8 +91,8 @@ public class TodoRepositoryTest {
     @Transactional
     @Rollback(false)
     void todoUpdateTest() {
-        Todo todo1 = new Todo("Todo content1", false, null);
-        Todo todo2 = new Todo("Todo content2", false, null);
+        Todo todo1 = new Todo("Todo content1", null);
+        Todo todo2 = new Todo("Todo content2", null);
         todoRepository.save(todo1);
         todoRepository.save(todo2);
         todoRepository.flushAndClear();

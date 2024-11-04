@@ -3,11 +3,13 @@ package com.example.todoapi.todo;
 import com.example.todoapi.member.Member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
+@NoArgsConstructor
 public class TodoRepository {
 
     @PersistenceContext

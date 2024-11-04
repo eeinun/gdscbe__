@@ -36,9 +36,9 @@ public class FRRepositoryTest {
         fRRepository.save(fr2);
 
         // Read-many test
-        Assertions.assertThat(fRRepository.findEveryFriendRelation(member1)).hasSize(2);
-        Assertions.assertThat(fRRepository.findEveryFriendRelation(member2)).hasSize(1);
-        Assertions.assertThat(fRRepository.findEveryFriendRelation(member3)).hasSize(1);
+        Assertions.assertThat(fRRepository.findEveryFriendRelations(member1)).hasSize(2);
+        Assertions.assertThat(fRRepository.findEveryFriendRelations(member2)).hasSize(1);
+        Assertions.assertThat(fRRepository.findEveryFriendRelations(member3)).hasSize(1);
 
         // Read-one test
         Assertions.assertThat(fRRepository.hasFriendRelation(member1, member2)).isTrue();

@@ -16,10 +16,24 @@ public class FriendRelationsRepository {
         em.persist(fr);
     }
 
-    public List<FriendRelations> findEveryFriendRelation(Member member) {
+    public List<FriendRelations> findEveryFriendRelations(Member member) {
         return em.createQuery("select t from FriendRelations t where t.member = :member or t.friend = :member", FriendRelations.class)
                 .setParameter("member", member)
                 .getResultList();
+    }
+
+    public FriendRelations getStrictRelation(Member member1, Member member2) {
+        FriendRelations rel_forward = em.createQuery("select t from FriendRelations t where t.member = :member1 and t.friend = :member2", FriendRelations.class)
+                .setParameter("member1", member1)
+                .setParameter("member2", member2)
+                .getSingleResult();
+        if (rel_forward != null) {
+            return rel_forward;
+        }
+        return em.createQuery("select t from FriendRelations t where t.member = :member1 and t.friend = :member2", FriendRelations.class)
+                .setParameter("member1", member2)
+                .setParameter("member2", member1)
+                .getSingleResult();
     }
 
     public Boolean hasFriendRelation(Member member1, Member member2) {
