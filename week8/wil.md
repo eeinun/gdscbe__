@@ -58,20 +58,21 @@ public class TodoServiceTest {
     // Mock 주입
     @InjectMocks
     TodoService todoService;
-    
+
     // ...
 
     @Test
     void testTodoService() throws Exception {
         // given(): mock 객체의 특정 메소드 호출 시 반환값 임의 지정 가능
         // given(<class>.<method>(<actual-parameter>)).willReturn(<something>)
+        // 레포지토리가 가짜이므로 메소드의 동작을 설정해줘야 함
         given(memberRepository.findById(anyLong())).willReturn(new Member());
 
         // when
         todoService.createTodo("content", 1L);
 
         // verify(): mock 객체의 특정 메서드를 몇번 호출 했는지 검증
-        // mock객체의 save가 1번 호출됐는지 검증
+        // todoRepository mock객체의 save가 1번 호출됐는지 검증
         verify(todoRepository, times(1)).save(any(Todo.class));
     }
 
