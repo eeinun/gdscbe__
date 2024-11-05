@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+
 @ExtendWith(MockitoExtension.class)
 public class TodoServiceTest {
     @Mock
@@ -25,7 +27,7 @@ public class TodoServiceTest {
     @Test
     public void createTodoTest() throws Exception{
         // given (precondition)
-        BDDMockito.given(memberRepository.findById(1L)).willReturn(new Member());
+        BDDMockito.given(memberRepository.findById(anyLong())).willReturn(new Member());
 
         // when (run)
         todoService.createTodo("content", 1L);
@@ -35,7 +37,7 @@ public class TodoServiceTest {
     }
 
     @Test
-    public void createTodoTest_when_fails() throws Exception {
+    public void createTodo() throws Exception {
         BDDMockito.given(memberRepository.findById(1L)).willReturn(new Member());
         Assertions.assertThatThrownBy(() -> {
             todoService.createTodo("content", 123456L);

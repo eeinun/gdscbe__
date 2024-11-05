@@ -1,6 +1,5 @@
 package com.example.todoapi.todo;
 
-import com.example.todoapi.friendRelations.FriendRelations;
 import com.example.todoapi.friendRelations.FriendRelationsRepository;
 import com.example.todoapi.member.Member;
 import com.example.todoapi.member.MemberRepository;
@@ -28,7 +27,7 @@ public class TodoService {
     }
 
     // 내 할 일, 친구의 할 일 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Todo> getTodoList(Long memberId, Long requestedMemberId) throws Exception{
         Member member = memberRepository.findById(memberId);
         Member requestedMember = memberRepository.findById(requestedMemberId);
@@ -68,8 +67,13 @@ public class TodoService {
         todo.toggleTodo();
     }
 
-    @Transactional(readOnly = true)
-    public void deleteContent(Long todoId) throws Exception {
+    @Transactional
+    public void deleteTodo(Long memberId, Long todoId) throws Exception {
+        Todo todo = todoRepository.findById(todoId);
+        Member member = memberRepository.findById(memberId);
+        if (todo.getMember() != member) {
+            throw new Exception("Access denied.");
+        }
         todoRepository.deleteById(todoId);
     }
 }

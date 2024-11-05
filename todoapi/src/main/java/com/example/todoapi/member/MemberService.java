@@ -13,7 +13,7 @@ public class MemberService {
     public void save(String email, String password, String nickname) throws Exception {
         Member member = new Member(email, password, nickname);
         if (memberRepository.findByEmail(email) != null) {
-            throw new Exception("This email already registered.");
+            throw new Exception("Email already registered.");
         }
         memberRepository.save(member);
     }
@@ -24,10 +24,9 @@ public class MemberService {
     }
 
     @Transactional
-    public void changePassword(Long memberId, String newPassword) throws Exception {
-        Member member = memberRepository.findById(memberId);
-        if (member == null) {
-            throw new Exception("Member not found.");
+    public void changePassword(Member member, String currentPassword, String newPassword) throws Exception {
+        if (!member.getPassword().equals(currentPassword)) {
+            throw new Exception("Wrong password.");
         }
         member.updatePassword(newPassword);
     }
