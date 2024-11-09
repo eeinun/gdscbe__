@@ -2,18 +2,25 @@ package com.example.todoapi.member;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
+@NoArgsConstructor
 public class MemberRepository {
     @PersistenceContext
     private EntityManager em;
 
-    public void save(Member member) {
+    public Long save(Member member) {
         em.persist(member);
+        return member.getId();
     }
 
-    public Member findById(long id) { return em.createQuery("select m from Member m where m.id = :id", Member.class).getSingleResult(); }
+    public Member findById(long id) {
+        return em.find(Member.class, id);
+    }
 
     public Member findByEmail(String email) {
         return em.createQuery("select m from Member m where m.email = :email", Member.class)
@@ -21,10 +28,17 @@ public class MemberRepository {
                 .getSingleResult();
     }
 
-    public Member findByEmailPw(String email, String password) {
-        return em.createQuery("select m from Member m where m.email = :email and m.password = :password", Member.class)
+    public List<Member> findByNickname(String email) {
+        return em.createQuery("select m from Member m where m.email = :email", Member.class)
                 .setParameter("email", email)
-                .setParameter("password", password)
-                .getSingleResult();
+                .getResultList();
+    }
+
+    public void delete(Member member) {
+        em.remove(member);
+    }
+
+    public void DeleteById(long id) {
+        em.remove(em.find(Member.class, id));
     }
 }

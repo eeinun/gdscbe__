@@ -16,54 +16,104 @@ public class FriendRelationsService {
     FriendRelationsRepository friendRelationsRepository;
     MemberRepository memberRepository;
 
-    // 친구 추가
     @Transactional
-    public void addFriend(Long memberId1, Long memberId2) throws Exception {
+    public void createFriendRelation(Long memberId1, Long memberId2) throws Exception {
+        FriendRelations fr = this.getFriendRelationByMemberId(memberId1, memberId2);
+        if (fr.getState() == FriendRelations.State.PENDING) {
+            throw new Exception("Friend request is pending.");
+        }
+        if (fr.getState() == FriendRelations.State.ACCEPTED) {
+            throw new Exception("Friend request is already accepted.");
+        }
+        if (fr.getState() == FriendRelations.State.BLOCKED) {
+            throw new Exception("Friend request is blocked.");
+        }
+        FriendRelations frReverse = this.getFriendRelationByMemberId(memberId2, memberId1);
+        if (frReverse != null) {
+            throw new Exception("Friend request already has been made from other side.");
+        }
+        friendRelationsRepository.save(fr);
+    }
+
+    @Transactional
+    public FriendRelations getFriendRelationByMemberId(Long memberId1, Long memberId2) throws Exception {
+        if (memberId1.equals(memberId2)) {
+            throw new Exception("Member id is same.");
+        }
         Member member1 = memberRepository.findById(memberId1);
         Member member2 = memberRepository.findById(memberId2);
         if (member1 == null || member2 == null) {
             throw new Exception("Some members not exist.");
         }
-        if (friendRelationsRepository.hasFriendRelation(member1, member2)) {
-            throw new Exception("Already friend.");
+        FriendRelations fr = friendRelationsRepository.findFriendRelationByMembers(member1, member2);
+        FriendRelations frReverse = friendRelationsRepository.findFriendRelationByMembers(member2, member1);
+        if (fr != null) {
+            return fr;
         }
-        FriendRelations friendRelations = new FriendRelations(member1, member2);
-        friendRelationsRepository.save(friendRelations);
+        if (frReverse != null) {
+            return frReverse;
+        }
+        throw new Exception("No friend relation found.");
     }
 
-    // 모든 친구 조회
     @Transactional
-    public List<Member> getFriends(Long memberId) {
+    public List<Member> getFriendList(Long memberId) {
         Member member = memberRepository.findById(memberId);
-        HashSet<Member> friends = new HashSet<>();
-        List<FriendRelations> rel = friendRelationsRepository.findEveryFriendRelations(member);
-        for (FriendRelations friend : rel) {
-            if (!friend.getMember().equals(member)) { friends.add(friend.getMember()); }
-            if (!friend.getFriend().equals(member)) { friends.add(friend.getFriend()); }
+        HashSet<Member> friendSet = new HashSet<>();
+        List<FriendRelations> rel = friendRelationsRepository.findAllFriendRelationsByMember(member);
+        for (FriendRelations fr : rel) {
+            if (fr.getState() != FriendRelations.State.ACCEPTED) {
+                continue;
+            }
+            if (!fr.getMember1().equals(member)) {
+                friendSet.add(fr.getMember2());
+            } else {
+                friendSet.add(fr.getMember1());
+            }
         }
-        return new ArrayList<>(friends);
+        return new ArrayList<>(friendSet);
     }
 
-    // 친구맞음?
     @Transactional
-    public boolean isFriend(Long memberId1, Long memberId2) throws Exception {
-        Member member1 = memberRepository.findById(memberId1);
-        Member member2 = memberRepository.findById(memberId2);
-        if (member1 == null || member2 == null) {
-            throw new Exception("Some members not exist.");
+    public boolean hasFriendRelation(Long memberId1, Long memberId2) throws Exception {
+        FriendRelations fr1 = this.getFriendRelationByMemberId(memberId1, memberId2);
+        if (fr1 != null && fr1.getState() == FriendRelations.State.ACCEPTED) {
+            return true;
         }
-        return friendRelationsRepository.hasFriendRelation(member1, member2);
+        FriendRelations fr2 = this.getFriendRelationByMemberId(memberId1, memberId2);
+        return fr2 != null && fr2.getState() == FriendRelations.State.ACCEPTED;
     }
 
-    // 친구 삭제
     @Transactional
-    public void removeFriend(Long memberId1, Long memberId2) throws Exception {
-        Member member1 = memberRepository.findById(memberId1);
-        Member member2 = memberRepository.findById(memberId2);
-        if (member1 == null || member2 == null) {
-            throw new Exception("Some members not exist.");
+    public List<FriendRelations> getPendingInboundFriendRequest(Long memberId) throws Exception {
+        Member member = memberRepository.findById(memberId);
+        return friendRelationsRepository.findInboundFriendRelationsWithState(member, FriendRelations.State.PENDING);
+    }
+
+    @Transactional
+    public List<FriendRelations> getBlockedInboundFriendRequest(Long memberId) throws Exception {
+        Member member = memberRepository.findById(memberId);
+        return friendRelationsRepository.findInboundFriendRelationsWithState(member, FriendRelations.State.BLOCKED);
+    }
+
+    @Transactional
+    public List<FriendRelations> getPendingOutboundFriendRequest(Long memberId) throws Exception {
+        Member member = memberRepository.findById(memberId);
+        return friendRelationsRepository.findOutboundFriendRelationsWithState(member, FriendRelations.State.PENDING);
+    }
+
+    @Transactional
+    public List<FriendRelations> getBlockedOutboundFriendRequest(Long memberId) throws Exception {
+        Member member = memberRepository.findById(memberId);
+        return friendRelationsRepository.findOutboundFriendRelationsWithState(member, FriendRelations.State.BLOCKED);
+    }
+
+    @Transactional
+    public void deleteFriend(Long memberId1, Long memberId2) throws Exception {
+        FriendRelations fr = this.getFriendRelationByMemberId(memberId1, memberId2);
+        if (fr.getState() == FriendRelations.State.BLOCKED && fr.getMember1().equals(memberRepository.findById(memberId1))) {
+            throw new Exception("Can't delete blocked relationship by self.");
         }
-        FriendRelations fr = friendRelationsRepository.getStrictRelation(member1, member2);
-        friendRelationsRepository.removeFriendRelation(fr);
+        friendRelationsRepository.deleteFriendRelation(fr);
     }
 }

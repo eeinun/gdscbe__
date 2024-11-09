@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter(AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Todo {
+    public static final Integer CONTENT_MAXLENGTH = 2000;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "BIGINT")
@@ -18,16 +19,16 @@ public class Todo {
     @Column(name = "content", columnDefinition = "VARCHAR(2000)")
     private String content;
 
-    @Column(name = "toggle", columnDefinition = "BOOLEAN")
-    private boolean toggle;
+    @Column(name = "isChecked", columnDefinition = "BOOLEAN")
+    private boolean isChecked;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "uid")
+    @JoinColumn(name = "member")
     private Member member;
 
     public Todo(String content, Member member) {
         this.content = content;
-        this.toggle = false;
+        this.isChecked = false;
         this.member = member;
     }
 
@@ -35,7 +36,7 @@ public class Todo {
         this.content = newContent;
     }
 
-    public void toggleTodo() {
-        this.toggle = !this.toggle;
+    public void updateChecked(boolean isChecked) {
+        this.isChecked = !this.isChecked;
     }
 }

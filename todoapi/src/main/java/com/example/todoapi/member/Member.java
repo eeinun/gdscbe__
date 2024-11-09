@@ -12,7 +12,7 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "BIGINT")
-    private Long uid;
+    private Long id;
 
     @Column(name = "email", columnDefinition = "VARCHAR(320)")
     private String email;

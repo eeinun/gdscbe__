@@ -36,17 +36,17 @@ public class FRRepositoryTest {
         fRRepository.save(fr2);
 
         // Read-many test
-        Assertions.assertThat(fRRepository.findEveryFriendRelations(member1)).hasSize(2);
-        Assertions.assertThat(fRRepository.findEveryFriendRelations(member2)).hasSize(1);
-        Assertions.assertThat(fRRepository.findEveryFriendRelations(member3)).hasSize(1);
+        Assertions.assertThat(fRRepository.findAllFriendRelationsByMember(member1)).hasSize(2);
+        Assertions.assertThat(fRRepository.findAllFriendRelationsByMember(member2)).hasSize(1);
+        Assertions.assertThat(fRRepository.findAllFriendRelationsByMember(member3)).hasSize(1);
 
         // Read-one test
-        Assertions.assertThat(fRRepository.hasFriendRelation(member1, member2)).isTrue();
-        Assertions.assertThat(fRRepository.hasFriendRelation(member1, member3)).isTrue();
-        Assertions.assertThat(fRRepository.hasFriendRelation(member3, member2)).isFalse();
+        Assertions.assertThat(fRRepository.findFriendRelationByMembers(member1, member2) != null).isTrue();
+        Assertions.assertThat(fRRepository.findFriendRelationByMembers(member1, member3) != null).isTrue();
+        Assertions.assertThat(fRRepository.findFriendRelationByMembers(member3, member2) != null).isFalse();
 
         // Delete test
-        fRRepository.removeFriendRelation(fr1);
-        Assertions.assertThat(fRRepository.hasFriendRelation(member1, member2)).isFalse();
+        fRRepository.deleteFriendRelation(fr1);
+        Assertions.assertThat(fRRepository.findFriendRelationByMembers(member1, member2) != null).isFalse();
     }
 }

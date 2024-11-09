@@ -25,31 +25,42 @@ public class MemberServiceTest {
     @Test
     public void saveTest_Normal() throws Exception {
         BDDMockito.willDoNothing().given(memberRepository).save(any());
-        memberService.save("T", "T", "T");
+        memberService.createMember("T", "T", "T");
         BDDMockito.verify(memberRepository, times(1)).save(any(Member.class));
     }
 
     @Test
     public void saveTest_AlreadyRegisteredEmail() throws Exception {
         BDDMockito.given(memberRepository.findByEmail(any())).willReturn(new Member());
-        Assertions.assertThatThrownBy(() -> memberService.save("T", "T", "T"))
+        Assertions.assertThatThrownBy(() -> memberService.createMember("T", "T", "T"))
                 .isInstanceOf(Exception.class)
                 .hasMessageContaining("Email already registered");
     }
 
     @Test
-    public void authenticateTest() {
-        BDDMockito.given(memberRepository.findByEmailPw(any(), any())).willReturn(null);
-        memberService.authenticate("T", "T");
-        BDDMockito.verify(memberRepository, times(1)).findByEmailPw("T", "T");
+    public void authenticateTest() throws Exception {
+        Member member = new Member("T", "T", "T");
+        BDDMockito.given(memberRepository.findByEmail(any())).willReturn(member);
+        Member loggedInMember = memberService.authenticate("T", "T");
+        BDDMockito.verify(memberRepository, times(1)).findByEmail("T");
+        Assertions.assertThat(loggedInMember).isNotNull();
     }
 
     @Test
     public void changePassword_IncorrectPassword() throws Exception {
         Member member = new Member("T", "T", "T");
-        Assertions.assertThatThrownBy(() -> memberService.changePassword(member, "wrong_password", "T"))
+        BDDMockito.given(memberRepository.findByEmail(any())).willReturn(member);
+        Assertions.assertThatThrownBy(() -> memberService.changePassword("T", "wrong_password", "T"))
                 .isInstanceOf(Exception.class)
                 .hasMessageContaining("Wrong password");
+    }
+    @Test
+    public void changePassword_IncorrectEmail() throws Exception {
+        Member member = new Member("T", "T", "T");
+        BDDMockito.given(memberRepository.findByEmail(any())).willReturn(null);
+        Assertions.assertThatThrownBy(() -> memberService.changePassword("T", "wrong_password", "T"))
+                .isInstanceOf(Exception.class)
+                .hasMessageContaining("Email does not exist.");
     }
 
     @Test

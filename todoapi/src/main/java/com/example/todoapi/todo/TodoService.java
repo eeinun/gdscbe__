@@ -1,6 +1,7 @@
 package com.example.todoapi.todo;
 
 import com.example.todoapi.friendRelations.FriendRelationsRepository;
+import com.example.todoapi.friendRelations.FriendRelationsService;
 import com.example.todoapi.member.Member;
 import com.example.todoapi.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,63 +18,66 @@ public class TodoService {
     private final FriendRelationsRepository friendRelationsRepository;
 
     @Transactional
-    public void createTodo(String content, Long memberId) throws Exception {
+    public Long createTodo(String content, Long memberId) throws Exception {
         Member member = memberRepository.findById(memberId);
         if (member == null) {
             throw new Exception("Member not exists.");
         }
         Todo todo = new Todo(content, member);
-        todoRepository.save(todo);
+        return todoRepository.save(todo);
     }
 
     // 내 할 일, 친구의 할 일 조회
     @Transactional(readOnly = true)
-    public List<Todo> getTodoList(Long memberId, Long requestedMemberId) throws Exception{
-        Member member = memberRepository.findById(memberId);
-        Member requestedMember = memberRepository.findById(requestedMemberId);
-        if (member == null) {
-            throw new Exception("Member not exists.");
+    public List<Todo> getTodoList(Long memberId, Long requestedMemberId) throws Exception {
+        FriendRelationsService friendRelationsService = new FriendRelationsService();
+        friendRelationsService.hasFriendRelation(memberId, requestedMemberId);
+        if (requestedMemberId.equals(memberId) || friendRelationsService.hasFriendRelation(memberId, requestedMemberId)) {
+            return todoRepository.findAllByMember(memberRepository.findById(memberId));
         }
-        if (!requestedMemberId.equals(memberId)) {
-            if (!friendRelationsRepository.hasFriendRelation(member, requestedMember)) {
-                throw new Exception("Access denied.");
-            }
-        }
-        return todoRepository.findAllByMember(member);
+        throw new Exception("Access denied.");
     }
 
     @Transactional
-    public void updateTodo(Long todoId, Long memberId, String updateContent) throws Exception{
-        Member member = memberRepository.findById(memberId);
+    public boolean isEditable(Long todoId, Long memberId) throws Exception {
         Todo todo = todoRepository.findById(todoId);
-        if (member == null) {
-            throw new Exception("Member not exists.");
-        }
         if (todo == null) {
-            throw new Exception("Todo not exists.");
+            throw new Exception("Todo not exists");
         }
-        if (todo.getMember() != member) {
-            throw new Exception("Access denied.");
+        Member member = memberRepository.findById(memberId);
+        if (member == null) {
+            throw new Exception("Member not exists");
         }
-        todo.updateContent(updateContent);
+        return todo.getMember().equals(member);
     }
 
     @Transactional
-    public void toggleTodo(Long todoId) throws Exception{
-        Todo todo = todoRepository.findById(todoId);
-        if (todo == null) {
-            throw new Exception("Invalid todo ID.");
+    public void updateContent(Long todoId, Long memberId, String updateContent) throws Exception {
+        if (updateContent.length() > Todo.CONTENT_MAXLENGTH) {
+            throw new Exception("Content length over " + Todo.CONTENT_MAXLENGTH);
         }
-        todo.toggleTodo();
+        if (this.isEditable(todoId, memberId)) {
+            todoRepository.findById(todoId).updateContent(updateContent);
+        } else {
+            throw new Exception("Access Denied");
+        }
+    }
+
+    @Transactional
+    public void toggleIsChecked(Long todoId, Long memberId) throws Exception {
+        if (this.isEditable(todoId, memberId)) {
+            Todo todo = todoRepository.findById(todoId);
+            todo.updateChecked(!todo.isChecked());
+        } else {
+            throw new Exception("Access Denied");
+        }
     }
 
     @Transactional
     public void deleteTodo(Long memberId, Long todoId) throws Exception {
-        Todo todo = todoRepository.findById(todoId);
-        Member member = memberRepository.findById(memberId);
-        if (todo.getMember() != member) {
-            throw new Exception("Access denied.");
+        if (this.isEditable(todoId, memberId)) {
+            todoRepository.deleteById(todoId);
         }
-        todoRepository.deleteById(todoId);
+        throw new Exception("Access denied.");
     }
 }

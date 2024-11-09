@@ -4,13 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void save(String email, String password, String nickname) throws Exception {
+    public void createMember(String email, String password, String nickname) throws Exception {
         Member member = new Member(email, password, nickname);
         if (memberRepository.findByEmail(email) != null) {
             throw new Exception("Email already registered.");
@@ -19,15 +21,34 @@ public class MemberService {
     }
 
     @Transactional
-    public boolean authenticate(String email, String password) {
-        return memberRepository.findByEmailPw(email, password) == null;
+    public Member authenticate(String email, String password) throws Exception {
+        Member member = memberRepository.findByEmail(email);
+        if (member == null) {
+            throw new Exception("Email does not exist.");
+        }
+        if (!member.getPassword().equals(password)) {
+            throw new Exception("Wrong password.");
+        }
+        return member;
     }
 
     @Transactional
-    public void changePassword(Member member, String currentPassword, String newPassword) throws Exception {
-        if (!member.getPassword().equals(currentPassword)) {
-            throw new Exception("Wrong password.");
+    public Member getMemberByEmail(String email) throws Exception {
+        Member member = memberRepository.findByEmail(email);
+        if (member == null) {
+            throw new Exception("Member does not exist.");
         }
+        return member;
+    }
+
+    @Transactional
+    public List<Member> getMemberListByNickname(String nickname) {
+        return memberRepository.findByNickname(nickname);
+    }
+
+    @Transactional
+    public void changePassword(String email, String currentPassword, String newPassword) throws Exception {
+        Member member = this.authenticate(email, currentPassword);
         member.updatePassword(newPassword);
     }
 
@@ -37,6 +58,15 @@ public class MemberService {
         if (member == null) {
             throw new Exception("Member not found.");
         }
-        member.updatePassword(newNickname);
+        member.updateNickname(newNickname);
+    }
+
+    @Transactional
+    public void deleteMemberById(Long memberId) throws Exception {
+        Member member = memberRepository.findById(memberId);
+        if (member == null) {
+            throw new Exception("Member not found.");
+        }
+        memberRepository.delete(member);
     }
 }

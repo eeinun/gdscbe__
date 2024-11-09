@@ -16,13 +16,14 @@ public class TodoRepository {
     private EntityManager em;
 
     // Create
-    public void save(Todo todo) {
+    public Long save(Todo todo) {
         em.persist(todo); // put todo object in persistant context
+        return todo.getId();
     }
 
     // Read one
-    public Todo findById(Long id) {
-        return em.find(Todo.class, id);
+    public Todo findById(Long uid) {
+        return em.find(Todo.class, uid);
     }
 
     // Read all
@@ -32,7 +33,6 @@ public class TodoRepository {
 
     // Read conditional
     public List<Todo> findAllByMember(Member member) {
-
         return em.createQuery("select t from Todo as t where t.member = :member", Todo.class)
                 .setParameter("member", member)
                 .getResultList();
