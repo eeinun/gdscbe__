@@ -34,3 +34,8 @@ public class TodoController {
     }
 }
 ```
+
+## 구현 및 실행 결과 스크린샷
+### 유저 생성 (회원 가입)
+![회원가입 성공](image.png)
+![이메일 중복으로 실패](image-1.png)
