@@ -37,6 +37,9 @@ public class FriendRelationsService {
 
     @Transactional
     public FriendRelations getFriendRelationByMemberId(Long memberId1, Long memberId2) throws Exception {
+        if (memberId1 == null || memberId2 == null) {
+            throw new Exception("Some member id is null.");
+        }
         if (memberId1.equals(memberId2)) {
             throw new Exception("Member id is same.");
         }
@@ -85,27 +88,57 @@ public class FriendRelationsService {
     }
 
     @Transactional
-    public List<FriendRelations> getPendingInboundFriendRequest(Long memberId) throws Exception {
+    public List<Member> getPendingInboundFriendRequest(Long memberId) throws Exception {
         Member member = memberRepository.findById(memberId);
-        return friendRelationsRepository.findInboundFriendRelationsWithState(member, FriendRelations.State.PENDING);
+        List<FriendRelations> pending = friendRelationsRepository.findInboundFriendRelationsWithState(member, FriendRelations.State.PENDING);
+        List<Member> requesters = new ArrayList<>();
+        for (FriendRelations fr : pending) { requesters.add(fr.getMember1()); }
+        return requesters;
     }
 
     @Transactional
-    public List<FriendRelations> getBlockedInboundFriendRequest(Long memberId) throws Exception {
+    public List<Member> getBlockedInboundFriendRequest(Long memberId) throws Exception {
         Member member = memberRepository.findById(memberId);
-        return friendRelationsRepository.findInboundFriendRelationsWithState(member, FriendRelations.State.BLOCKED);
+        List<FriendRelations> blocked = friendRelationsRepository.findInboundFriendRelationsWithState(member, FriendRelations.State.BLOCKED);
+        List<Member> requesters = new ArrayList<>();
+        for (FriendRelations fr : blocked) { requesters.add(fr.getMember1()); }
+        return requesters;
     }
 
     @Transactional
-    public List<FriendRelations> getPendingOutboundFriendRequest(Long memberId) throws Exception {
+    public List<Member> getPendingOutboundFriendRequest(Long memberId) throws Exception {
         Member member = memberRepository.findById(memberId);
-        return friendRelationsRepository.findOutboundFriendRelationsWithState(member, FriendRelations.State.PENDING);
+        List<FriendRelations> pending = friendRelationsRepository.findOutboundFriendRelationsWithState(member, FriendRelations.State.PENDING);
+        List<Member> requesters = new ArrayList<>();
+        for (FriendRelations fr : pending) { requesters.add(fr.getMember1()); }
+        return requesters;
     }
 
     @Transactional
-    public List<FriendRelations> getBlockedOutboundFriendRequest(Long memberId) throws Exception {
-        Member member = memberRepository.findById(memberId);
-        return friendRelationsRepository.findOutboundFriendRelationsWithState(member, FriendRelations.State.BLOCKED);
+    public void acceptFriendRequest(Long memberId1, Long memberId2) throws Exception {
+        Member member1 = memberRepository.findById(memberId1);
+        Member member2 = memberRepository.findById(memberId2);
+        FriendRelations fr = friendRelationsRepository.findFriendRelationByMembers(member2, member1);
+        if (fr == null) { throw new Exception("Friend relation is not acceptable or not exists."); }
+        fr.updateState(FriendRelations.State.ACCEPTED);
+    }
+
+    @Transactional
+    public void blockFriendRequest(Long memberId1, Long memberId2) throws Exception {
+        if (!this.hasFriendRelation(memberId1, memberId2)) {
+            throw new Exception("FriendRelation not exists.");
+        }
+        Member member1 = memberRepository.findById(memberId1);
+        Member member2 = memberRepository.findById(memberId2);
+        FriendRelations fr = this.getFriendRelationByMemberId(memberId1, memberId2);
+        // 차단당한 상대는 해제할 수 없어야하고 member1은 차단할 수 없게 돼있으므로 맞춰서
+        if (fr.getMember1() == member1 && fr.getMember2() == member2) {
+            friendRelationsRepository.deleteFriendRelation(fr);
+            friendRelationsRepository.save(new FriendRelations(member2, member1));
+        }
+        else {
+            fr.updateState(FriendRelations.State.BLOCKED);
+        }
     }
 
     @Transactional

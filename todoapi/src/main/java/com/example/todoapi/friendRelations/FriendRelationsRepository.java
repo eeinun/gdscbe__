@@ -13,6 +13,7 @@ public class FriendRelationsRepository {
     private EntityManager em;
 
     public void save(FriendRelations fr) {
+        fr.updateState(FriendRelations.State.PENDING);
         em.persist(fr);
     }
 

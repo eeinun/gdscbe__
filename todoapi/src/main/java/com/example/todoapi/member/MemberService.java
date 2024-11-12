@@ -12,12 +12,13 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void createMember(String email, String password, String nickname) throws Exception {
+    public Long createMember(String email, String password, String nickname) throws Exception {
         Member member = new Member(email, password, nickname);
         if (memberRepository.findByEmail(email) != null) {
             throw new Exception("Email already registered.");
         }
         memberRepository.save(member);
+        return member.getId();
     }
 
     @Transactional
@@ -62,11 +63,8 @@ public class MemberService {
     }
 
     @Transactional
-    public void deleteMemberById(Long memberId) throws Exception {
-        Member member = memberRepository.findById(memberId);
-        if (member == null) {
-            throw new Exception("Member not found.");
-        }
+    public void deleteMember(String email, String password) throws Exception {
+        Member member = this.authenticate(email, password);
         memberRepository.delete(member);
     }
 }

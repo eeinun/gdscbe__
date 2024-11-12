@@ -15,7 +15,7 @@ import java.util.List;
 public class TodoController {
     private final TodoService todoService;
 
-    // request --> json --> DTO --> 처리 --> ResponseEntitiy로 응답 생성
+    // request --> json --> DTO --> 처리 --> ResponseEntity 로 응답 생성
     @PostMapping
     public ResponseEntity<Void> createTodo(@RequestBody TodoCreateRequest request) throws Exception {
         Long todoId = todoService.createTodo(request.getContent(), request.getUid());
@@ -38,5 +38,10 @@ public class TodoController {
     public ResponseEntity<Void> updateTodo(@PathVariable Long todoId, @RequestBody TodoUpdateRequest request) throws Exception {
         todoService.updateContent(todoId, request.getMemberId(), request.getContent());
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{todoId}/toggle")
+    public ResponseEntity<Boolean> toggleTodo(@PathVariable Long todoId, @RequestBody Long memberId) throws Exception {
+        return ResponseEntity.ok(todoService.toggleIsChecked(todoId, memberId));
     }
 }

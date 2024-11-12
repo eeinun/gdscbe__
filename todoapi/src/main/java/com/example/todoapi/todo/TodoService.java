@@ -31,7 +31,6 @@ public class TodoService {
     @Transactional(readOnly = true)
     public List<Todo> getTodoList(Long memberId, Long requestedMemberId) throws Exception {
         FriendRelationsService friendRelationsService = new FriendRelationsService();
-        friendRelationsService.hasFriendRelation(memberId, requestedMemberId);
         if (requestedMemberId.equals(memberId) || friendRelationsService.hasFriendRelation(memberId, requestedMemberId)) {
             return todoRepository.findAllByMember(memberRepository.findById(memberId));
         }
@@ -64,10 +63,11 @@ public class TodoService {
     }
 
     @Transactional
-    public void toggleIsChecked(Long todoId, Long memberId) throws Exception {
+    public Boolean toggleIsChecked(Long todoId, Long memberId) throws Exception {
         if (this.isEditable(todoId, memberId)) {
             Todo todo = todoRepository.findById(todoId);
             todo.updateChecked(!todo.isChecked());
+            return todo.isChecked();
         } else {
             throw new Exception("Access Denied");
         }
