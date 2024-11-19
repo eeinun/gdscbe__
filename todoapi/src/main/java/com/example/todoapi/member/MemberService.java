@@ -1,5 +1,6 @@
 package com.example.todoapi.member;
 
+import com.example.todoapi.common.message.ErrorMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +16,7 @@ public class MemberService {
     public Long createMember(String email, String password, String nickname) throws Exception {
         Member member = new Member(email, password, nickname);
         if (memberRepository.findByEmail(email) != null) {
-            throw new Exception("Email already registered.");
+            throw new Exception(ErrorMessage.EMAIL_ALREADY_EXISTS);
         }
         memberRepository.save(member);
         return member.getId();
@@ -25,10 +26,10 @@ public class MemberService {
     public Member authenticate(String email, String password) throws Exception {
         Member member = memberRepository.findByEmail(email);
         if (member == null) {
-            throw new Exception("Email does not exist.");
+            throw new Exception(ErrorMessage.EMAIL_NOT_EXISTS);
         }
         if (!member.getPassword().equals(password)) {
-            throw new Exception("Wrong password.");
+            throw new Exception(ErrorMessage.INCORRECT_PASSWORD);
         }
         return member;
     }
@@ -49,7 +50,7 @@ public class MemberService {
 
     @Transactional
     public void changePassword(String email, String currentPassword, String newPassword) throws Exception {
-        Member member = this.authenticate(email, currentPassword);
+        Member member = authenticate(email, currentPassword);
         member.updatePassword(newPassword);
     }
 
@@ -64,7 +65,7 @@ public class MemberService {
 
     @Transactional
     public void deleteMember(String email, String password) throws Exception {
-        Member member = this.authenticate(email, password);
+        Member member = authenticate(email, password);
         memberRepository.delete(member);
     }
 }

@@ -2,6 +2,7 @@ package com.example.todoapi.todo;
 
 import com.example.todoapi.todo.dto.TodoCreateRequest;
 import com.example.todoapi.todo.dto.TodoUpdateRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class TodoController {
 
     // request --> json --> DTO --> 처리 --> ResponseEntity 로 응답 생성
     @PostMapping
-    public ResponseEntity<Void> createTodo(@RequestBody TodoCreateRequest request) throws Exception {
+    public ResponseEntity<Void> createTodo(@RequestBody @Valid TodoCreateRequest request) throws Exception {
         Long todoId = todoService.createTodo(request.getContent(), request.getUid());
         return ResponseEntity.created(URI.create("/todo/" + todoId)).build();
     }

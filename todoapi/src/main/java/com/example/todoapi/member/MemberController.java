@@ -2,6 +2,7 @@ package com.example.todoapi.member;
 
 import com.example.todoapi.member.dto.MaskedMemberResponse;
 import com.example.todoapi.member.dto.MemberCreateRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class MemberController {
     }
 
     @PostMapping("/register")
-    ResponseEntity<Long> register(@RequestBody MemberCreateRequest request) throws Exception {
+    ResponseEntity<Long> register(@RequestBody @Valid MemberCreateRequest request) throws Exception {
         Long memberId = memberService.createMember(request.getEmail(), request.getPassword(), request.getNickname());
         return ResponseEntity.ok(memberId);
     }
