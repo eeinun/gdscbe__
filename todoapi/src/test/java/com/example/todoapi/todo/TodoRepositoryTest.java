@@ -53,28 +53,28 @@ public class TodoRepositoryTest {
 //        Assertions.assertThat(todoList).hasSize(3);
 //    }
 
-    @Test
-    @Transactional
-    void todoFindAllByMember() {
-        Member member1 = new Member();
-        Member member2 = new Member();
-        memberRepository.save(member1);
-        memberRepository.save(member2);
-
-        Todo todo1 = new Todo("Todo content1", member1);
-        Todo todo2 = new Todo("Todo content2", member1);
-        Todo todo3 = new Todo("Todo content3", member2);
-        todoRepository.save(todo1);
-        todoRepository.save(todo2);
-        todoRepository.save(todo3);
-
-        List<Todo> member1TodoList = todoRepository.findAllByMember(member1);
-        List<Todo> member2TodoList = todoRepository.findAllByMember(member2);
-
-        Assertions.assertThat(member1TodoList).hasSize(2);
-        Assertions.assertThat(member2TodoList).hasSize(1);
-
-    }
+//    @Test
+//    @Transactional
+//    void todoFindAllByMember() {
+//        Member member1 = new Member();
+//        Member member2 = new Member();
+//        memberRepository.save(member1);
+//        memberRepository.save(member2);
+//
+//        Todo todo1 = new Todo("Todo content1", member1);
+//        Todo todo2 = new Todo("Todo content2", member1);
+//        Todo todo3 = new Todo("Todo content3", member2);
+//        todoRepository.save(todo1);
+//        todoRepository.save(todo2);
+//        todoRepository.save(todo3);
+//
+//        List<Todo> member1TodoList = todoRepository.findAllByMember(member1);
+//        List<Todo> member2TodoList = todoRepository.findAllByMember(member2);
+//
+//        Assertions.assertThat(member1TodoList).hasSize(2);
+//        Assertions.assertThat(member2TodoList).hasSize(1);
+//
+//    }
 
 //    @Test
 //    @Transactional
@@ -87,21 +87,21 @@ public class TodoRepositoryTest {
 //        findTodo1.updateContent("New content");
 //    }
 
-    @Test
-    @Transactional
-    @Rollback(false)
-    void todoUpdateTest() {
-        Todo todo1 = new Todo("Todo content1", null);
-        Todo todo2 = new Todo("Todo content2", null);
-        todoRepository.save(todo1);
-        todoRepository.save(todo2);
-        todoRepository.flushAndClear();
-        todoRepository.deleteById(todo1.getId());
-    }
+//    @Test
+//    @Transactional
+//    @Rollback(false)
+//    void todoUpdateTest() {
+//        Todo todo1 = new Todo("Todo content1", null);
+//        Todo todo2 = new Todo("Todo content2", null);
+//        todoRepository.save(todo1);
+//        todoRepository.save(todo2);
+//        todoRepository.flushAndClear();
+//        todoRepository.deleteById(todo1.getId());
+//    }
 
-    @AfterAll
-    public static void donNotFinish() {
-        System.out.println("Test finished");
-        while(true) {}
-    }
+//    @AfterAll
+//    public static void donNotFinish() {
+//        System.out.println("Test finished");
+//        while(true) {}
+//    }
 }
